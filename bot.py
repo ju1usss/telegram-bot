@@ -1,17 +1,18 @@
-from telethon import TelegramClient, events
+from telethon import TelegramClient
+import os
 import re
 
-api_id = 32122247
-api_hash = "84e806980060e887c670f85b079a6903"
+api_id = int(os.getenv(32122247)
+api_hash = os.getenv(84e806980060e887c670f85b079a6903
+affiliate_link = os.getenv(https://www.usfans.com/register?ref=CKNBKZ
 
 source_channel = "cnfansfindglobal"
 target_channel = "@UsFansdrip"
 
-affiliate_link = "https://www.usfans.com/register?ref=CKNBKZ"
-
 client = TelegramClient("session", api_id, api_hash)
 
-def polish_text(text):
+
+def format_text(text):
     if not text:
         text = "🔥 Nowa okazja"
 
@@ -21,20 +22,25 @@ def polish_text(text):
 
 {text}
 
-💸 Link: {affiliate_link}
-⏳ Sprawdź szybko!
+👉 {affiliate_link}
 """
 
-@client.on(events.NewMessage(chats=source_channel))
-async def handler(event):
-    msg = event.message
-    text = polish_text(msg.text)
 
-    if msg.photo:
-        await client.send_file(target_channel, msg.photo, caption=text)
-    else:
-        await client.send_message(target_channel, text)
+async def main():
+    await client.start()
 
-print("Bot działa...")
-client.start()
-client.run_until_disconnected()
+    messages = await client.get_messages(source_channel, limit=5)
+
+    for msg in messages:
+        text = format_text(msg.text)
+
+        if msg.photo:
+            await client.send_file(target_channel, msg.photo, caption=text)
+        else:
+            await client.send_message(target_channel, text)
+
+    print("DONE")
+
+
+with client:
+    client.loop.run_until_complete(main())
